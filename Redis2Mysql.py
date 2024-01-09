@@ -61,13 +61,13 @@ class Redis2Mysql:
             if 'redis_connection' in locals() and self.redis_connection is not None:
                 self.redis_connection.close()
 
-    # ----------------寻医问药网站的同步器----------------
+    # --------------------------------寻医问药网站的同步器--------------------------------
     def transfer_xywy(self, key: str, db_name: str):
         value = self.redis_connection.hgetall(key)
 
         # --------解码所有键值对--------
         value = {k.decode('utf-8'): v.decode('utf-8') for k, v in value.items()}
-        logging.info(f"\033[32m====redis value====\n{value}\033[0m")
+        logging.info(f"\033[32m====XYWY redis value====\n{value}\033[0m")
 
         title = self.mysql_connection.escape(value['title'])
         quest = self.mysql_connection.escape(value['quest'])
@@ -79,18 +79,81 @@ class Redis2Mysql:
         hos_grade = self.mysql_connection.escape(value['hos_grade'])
         hos_name = self.mysql_connection.escape(value['hos_name'])
 
-    # ----------------好大夫网站的同步器----------------
+        # -------处理字符串-------这里不在VALUE里面加'的原因是escape已经帮我们加上去了
+        sql = f"""
+            INSERT INTO {db_name} (title, quest, url, answer, doc_name, doc_posts, department, hos_grade, hos_name)
+            VALUES ({title}, {quest}, {url}, {answer}, {doc_name}, {doc_posts}, {department}, {hos_grade}, {hos_name})
+            """
+        logging.debug(f"\033[34m====XYWY SQL====\n{sql}\033[0m")
+
+        redis_pipe = self.redis_connection.pipeline()  # 获取 Redis 客户端对象
+        redis_pipe.multi()  # 开启事务
+        self.mysql_connection.begin()  # 开启事务
+
+        try:
+            self.mysql_cursor.execute(sql)
+            self.mysql_connection.commit()
+            logging.info("\033[32m====XYWY Mysql row committed====\033[0m")
+            redis_pipe.delete(key)
+            redis_result = redis_pipe.execute()
+            logging.info(f"\033[32m====XYWY Redis row deleted:{redis_result}====\033[0m")
+        except Exception as e:
+            # 发生异常，回滚事务
+            self.mysql_connection.rollback()
+            # self.redis_pipe.execute()  # 自动回滚
+            logging.error(f"\033[31m====XYWY SQL Error Occurred: {e}====\033[0m")
+            raise e
+
+    # --------------------------------好大夫网站的同步器--------------------------------
     def transfer_haodf(self, key: str, db_name: str):
         value = self.redis_connection.hgetall(key)
 
-    # ----------------春雨医生网站的同步器----------------
+        # --------解码所有键值对--------
+        value = {k.decode('utf-8'): v.decode('utf-8') for k, v in value.items()}
+        logging.info(f"\033[32m====Haodf redis value====\n{value}\033[0m")
+
+        answer_url = self.mysql_connection.escape(value['answer_url'])
+        disease = self.mysql_connection.escape(value['disease'])
+        diseaseinfo = self.mysql_connection.escape(value['diseaseinfo'])
+        suggestions = self.mysql_connection.escape(value['suggestions'])
+        grade = self.mysql_connection.escape(value['grade'])
+        status = self.mysql_connection.escape(value['status'])
+        faculty = self.mysql_connection.escape(value['faculty'])
+        faculty_href = self.mysql_connection.escape(value['faculty_href'])
+
+        # -------处理字符串-------这里不在VALUE里面加'的原因是escape已经帮我们加上去了
+        sql = f"""
+            INSERT INTO {db_name} (answer_url, disease, diseaseinfo, suggestions, grade, status, faculty, faculty_href)
+            VALUES ({answer_url}, {disease}, {diseaseinfo}, {suggestions}, {grade}, {status}, {faculty}, {faculty_href})
+            """
+        logging.debug(f"\033[34m====Haodf SQL====\n{sql}\033[0m")
+
+        redis_pipe = self.redis_connection.pipeline()  # 获取 Redis 客户端对象
+        redis_pipe.multi()  # 开启事务
+        self.mysql_connection.begin()  # 开启事务
+
+        try:
+            self.mysql_cursor.execute(sql)
+            self.mysql_connection.commit()
+            logging.info("\033[32m====Haodf Mysql row committed====\033[0m")
+            redis_pipe.delete(key)
+            redis_result = redis_pipe.execute()
+            logging.info(f"\033[32m====Haodf Redis row deleted:{redis_result}====\033[0m")
+        except Exception as e:
+            # 发生异常，回滚事务
+            self.mysql_connection.rollback()
+            # self.redis_pipe.execute()  # 自动回滚
+            logging.error(f"\033[31m====Haodf SQL Error Occurred: {e}====\033[0m")
+            raise e
+
+    # --------------------------------春雨医生网站的同步器--------------------------------
     def transfer_sprain(self, key: str, db_name: str):
         value = self.redis_connection.hgetall(key)
 
         # --------解码所有键值对--------
         value = {k.decode('utf-8'): v.decode('utf-8') for k, v in value.items()}
-        logging.info(f"\033[32m====redis value====\n{value}\033[0m")
-        
+        logging.info(f"\033[32m====Sprain redis value====\n{value}\033[0m")
+
         issue_title = self.mysql_connection.escape(value['issue_title'])
         issue_desc = self.mysql_connection.escape(value['issue_desc'])
         case_url = self.mysql_connection.escape(value['case_url'])
@@ -102,7 +165,7 @@ class Redis2Mysql:
             INSERT INTO {db_name} (issue_title, issue_desc, answer, case_url, already_parsed)
             VALUES ({issue_title}, {issue_desc}, {answer}, {case_url}, {already_parsed})
             """
-        logging.debug(f"\033[34m====SQL====\n{sql}\033[0m")
+        logging.debug(f"\033[34m====Sprain SQL====\n{sql}\033[0m")
 
         redis_pipe = self.redis_connection.pipeline()  # 获取 Redis 客户端对象
         redis_pipe.multi()  # 开启事务
@@ -111,13 +174,13 @@ class Redis2Mysql:
         try:
             self.mysql_cursor.execute(sql)
             self.mysql_connection.commit()
-            logging.info("\033[32m====Mysql row committed====\033[0m")
+            logging.info("\033[32m====Sprain Mysql row committed====\033[0m")
             redis_pipe.delete(key)
             redis_result = redis_pipe.execute()
-            logging.info(f"\033[32m====Redis row deleted:{redis_result}====\033[0m")
+            logging.info(f"\033[32m====Sprain Redis row deleted:{redis_result}====\033[0m")
         except Exception as e:
             # 发生异常，回滚事务
             self.mysql_connection.rollback()
             # self.redis_pipe.execute()  # 自动回滚
-            logging.error(f"\033[31m====SQL Error Occurred: {e}====\033[0m")
+            logging.error(f"\033[31m====Sprain SQL Error Occurred: {e}====\033[0m")
             raise e
