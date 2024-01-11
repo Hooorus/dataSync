@@ -37,19 +37,6 @@ logging.basicConfig(level=logging.DEBUG)
 def schedule_job():
     global SYSTEM_EXEC_TURNS
     print("====Executing scheduled job: sync_redis_2_mysql====")
-    # redis2mysql_instance = Redis2Mysql.Redis2Mysql(mysql_host=mysql_host,
-    #                                                mysql_port=mysql_port,
-    #                                                mysql_user=mysql_user,
-    #                                                mysql_password=mysql_password,
-    #                                                mysql_database=mysql_database,
-    #                                                redis_host=redis_host,
-    #                                                redis_port=redis_port,
-    #                                                redis_db=redis_db,
-    #                                                batch_size=batch_size,
-    #                                                db_name_list=db_name_list,
-    #                                                table_structure_1,
-    #                                                table_structure_2,
-    #                                                table_structure_3)  # TODO 在这里传入可变数量参数
 
     redis2mysql_instance = Redis2Mysql.Redis2Mysql(mysql_host,
                                                    mysql_port,
