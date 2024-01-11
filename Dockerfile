@@ -10,9 +10,7 @@ FROM python:3.12
 WORKDIR /databaseSync
 
 # 复制脚本和配置文件到容器内
-COPY main.py .
-COPY Redis2Mysql.py .
-COPY config.yaml .
+COPY . /databaseSync
 # 复制cron任务到/etc/cron.d/目录
 COPY crontab /etc/cron.d/database_sync_cronjob
 
@@ -20,7 +18,7 @@ COPY crontab /etc/cron.d/database_sync_cronjob
 RUN pip install pyyaml pymysql redis
 
 # 给crontab配置文件以及脚本执行权限
-RUN chmod 0644 /etc/cron.d/my-cron && \
+RUN chmod 0644 /etc/cron.d/database_sync_cronjob && \
     chmod +x main.py && \
     chmod +x Redis2Mysql.py
 

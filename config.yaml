@@ -11,13 +11,9 @@ Redis:
   redis_db: 15
 
 Batch:
-  batch_size: 10
+  batch_size: 10000
 
 Tables:
-#  db_name_list:
-#    - scrapy_xywy
-#    - scrapy_haodf
-#    - scrapy_sprain_doc
   table_structures:
     - name: scrapy_xywy
       fields:

@@ -1,6 +1,6 @@
 import logging
 import yaml
-
+import os
 import Redis2Mysql
 
 # # MySQL 连接信息
@@ -30,11 +30,17 @@ import Redis2Mysql
 #
 # SYSTEM_EXEC_TURNS = 0
 
-logging.basicConfig(level=logging.DEBUG)
+# Get the absolute path to the directory containing the script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Construct the absolute path to the config.yaml file
+config_file_path = os.path.join(script_dir, 'config.yaml')
+
+logging.basicConfig(level=logging.INFO)
 
 
 # 读取config.yaml
-with open('config.yaml', 'r') as stream:
+with open(config_file_path, 'r') as stream:
     config = yaml.safe_load(stream)
 
 
@@ -60,21 +66,7 @@ redis_db = convert_type(config['Redis']['redis_db'], int)
 
 batch_size = convert_type(config['Batch']['batch_size'], int)
 
-# db_name_list = config['Tables']['db_name_list']
-
 table_structures = config['Tables']['table_structures']
-
-# 转换为列表形式
-# db_name_list = db_name_list if isinstance(db_name_list, list) else [db_name_list]
-
-# 处理 table_structures
-# table_structure_list = []
-# for table_structure in table_structures:
-#     name = table_structure['name']
-#     fields = table_structure['fields']
-#     # 打印或进行其他操作
-#     print(f"Table Structure Name: {name}")
-#     print(f"Fields: {fields}")
 
 if __name__ == '__main__':
     print("<<==== Welcome to Database Sync Controller ====>>")
