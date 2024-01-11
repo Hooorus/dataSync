@@ -1,0 +1,2 @@
+# 设置cron任务，每天下午7点执行脚本
+0 12 * * * root python /app/main.py >> /var/log/cron.log 2>&1

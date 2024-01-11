@@ -1,8 +1,5 @@
-import argparse
 import logging
 import yaml
-import time
-import schedule
 
 import Redis2Mysql
 
