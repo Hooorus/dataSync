@@ -1,0 +1,49 @@
+Database:
+  mysql_host: 192.168.1.204
+  mysql_port: 3308
+  mysql_user: root
+  mysql_password: 123456
+  mysql_database: spider01
+
+Redis:
+  redis_host: 192.168.1.212
+  redis_port: 6379
+  redis_db: 15
+
+Batch:
+  batch_size: 10
+
+Tables:
+#  db_name_list:
+#    - scrapy_xywy
+#    - scrapy_haodf
+#    - scrapy_sprain_doc
+  table_structures:
+    - name: scrapy_xywy
+      fields:
+        - title
+        - quest
+        - url
+        - answer
+        - doc_name
+        - doc_posts
+        - department
+        - hos_grade
+        - hos_name
+    - name: scrapy_haodf
+      fields:
+        - answer_url
+        - disease
+        - diseaseinfo
+        - suggestions
+        - grade
+        - status
+        - faculty
+        - faculty_href
+    - name: scrapy_sprain_doc
+      fields:
+        - issue_title
+        - issue_desc
+        - case_url
+        - answer
+        - already_parsed

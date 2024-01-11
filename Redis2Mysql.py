@@ -1,5 +1,7 @@
 import logging
 import re
+import time
+
 import pymysql
 import redis
 
@@ -15,14 +17,22 @@ class Redis2Mysql:
                  redis_port: int,
                  redis_db: int,
                  batch_size: int,
-                 db_name_list: list,
-                 *table_structures):
-        self.db_name_list = db_name_list  # 定义数据表名
-        self.table_structures = table_structures  # 这是一个可变数量参数的变量
+                 table_structure_list: list):
         self.batch_size = batch_size
+        # 转化table_structure_list
+        self.db_name_list = []  # 定义数据表名
+        self.table_structures = []  # 这是一个可变数量参数的变量
 
-        logging.info(f"self.table_structures: {self.table_structures}")
+        for table_structure in table_structure_list:
+            name = table_structure['name']
+            self.db_name_list.append(name)
+            fields = table_structure['fields']
+            self.table_structures.append(fields)
+        self.table_structures = tuple(self.table_structures)  # 变成可变参数
+        logging.debug(f"\033[34m======self.db_name_list: {self.db_name_list}======\033[0m")
+        logging.debug(f"\033[34m======self.table_structures: {self.table_structures}======\033[0m")
 
+        # ------------batch_sync_controller 不可动!!!!!!!!!!!!!!!!------------
         try:
             # ------------初始化Redis------------
             self.redis_connection = redis.StrictRedis(host=redis_host, port=redis_port, db=redis_db)
@@ -55,6 +65,7 @@ class Redis2Mysql:
 
                 self.batch_sync_controller(key, prefix, self.db_name_list, self.table_structures)
 
+            time.sleep(5)
         except pymysql.Error as mysql_error:
             logging.error(f"\033[31m====Mysql Error====\n{mysql_error}\033[0m")
         except redis.RedisError as redis_error:
