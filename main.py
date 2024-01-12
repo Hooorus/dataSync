@@ -1,6 +1,8 @@
 import logging
 import yaml
 import os
+
+import CSV2Redis
 import Redis2Mysql
 
 # # MySQL 连接信息
@@ -38,7 +40,6 @@ config_file_path = os.path.join(script_dir, 'config.yaml')
 
 logging.basicConfig(level=logging.INFO)
 
-
 # 读取config.yaml
 with open(config_file_path, 'r') as stream:
     config = yaml.safe_load(stream)
@@ -62,14 +63,18 @@ mysql_database = convert_type(config['Database']['mysql_database'], str)
 
 redis_host = convert_type(config['Redis']['redis_host'], str)
 redis_port = convert_type(config['Redis']['redis_port'], int)
-redis_db = convert_type(config['Redis']['redis_db'], int)
+redis_db_to_mysql = convert_type(config['Redis']['redis_db_to_mysql'], int)
+redis_db_from_csv = convert_type(config['Redis']['redis_db_from_csv'], int)
 
 batch_size = convert_type(config['Batch']['batch_size'], int)
 
 table_structures = config['Tables']['table_structures']
 
+csv_file_path = convert_type(config['CSV']['csv_location'], str)
+
 if __name__ == '__main__':
     print("<<==== Welcome to Database Sync Controller ====>>")
+    logging.info(f"\033[32m========Current Location: {os.getcwd()}========\033[0m")
     redis2mysql_instance = Redis2Mysql.Redis2Mysql(mysql_host,
                                                    mysql_port,
                                                    mysql_user,
@@ -77,13 +82,20 @@ if __name__ == '__main__':
                                                    mysql_database,
                                                    redis_host,
                                                    redis_port,
-                                                   redis_db,
+                                                   redis_db_to_mysql,
                                                    batch_size,
                                                    table_structures)
 
     redis2mysql_instance.sync_redis_2_mysql()
     logging.info(f"\033[32m========sync_redis_2_mysql Finished========\033[0m")
+    # 春雨医生issue数据csv->redis
 
+    # csv2redis_instance = CSV2Redis.CSV2Redis(redis_host,
+    #                                          redis_port,
+    #                                          redis_db_from_csv,
+    #                                          csv_file_path)
+    # csv2redis_instance.sync_csv_2_redis()
+    # logging.info(f"\033[32m========sync_csv_2_redis Finished========\033[0m")
 # ------------------------------------------------------------------------------------------------------------
 
 # def schedule_job():
