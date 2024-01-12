@@ -8,7 +8,11 @@ Database:
 Redis:
   redis_host: 192.168.1.212
   redis_port: 6379
-  redis_db: 15
+  redis_db_to_mysql: 15
+  redis_db_from_csv: 14
+
+CSV:
+  csv_location: /home/lym/databaseSync/csv/issue_url_container.csv
 
 Batch:
   batch_size: 10000
