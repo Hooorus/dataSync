@@ -46,4 +46,4 @@ Tables:
         - issue_desc
         - case_url
         - answer
-        - already_parsed
+#        - already_parsed
