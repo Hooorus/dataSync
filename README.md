@@ -1,5 +1,21 @@
 # DatabaseSync
 
+## 功能
+### CSV存入Redis
+1. 将待发送的csv文件放入`/csv`文件夹下，然后在`config.yaml`里面写入csv文件的绝对路径
+2. csv格式为：
+   ```text
+   URL               ALREADY_PARSED
+   待存入的URL       是否处理，0：未处理；1：已处理
+   ```
+3. 设置好csv后上传到服务器
+4. 在main.py里面激活
+5. 按照部署模式进行部署即可
+
+### Redis存入Mysql
+1. 编辑`config.yaml`，设置需要存入mysql的表结构
+2. 
+
 ## 部署模式
 
 ### 1. Docker部署
