@@ -14,7 +14,7 @@
 
 ### Redis存入Mysql
 1. 编辑`config.yaml`，设置需要存入mysql的表结构
-2. 
+2. 按照部署模式进行部署即可
 
 ## 部署模式
 
@@ -54,7 +54,7 @@ conda activate <your_environment_name>
 ```
 设置crontab
 ```shell
-# 设置cron任务，每天13点执行脚本，<>替换成你自己的位置
+# 设置cron任务，每天13点执行脚本，<>替换成你自己的位置，第一个是conda虚拟环境的指示器位置，第二个是main.py位置，第三个是输出的crontab.log位置
 # 0 18 * * * /home/lym/miniconda3/envs/database_sync/bin/python /home/lym/databaseSync/main.py > /home/lym/databaseSync/crontab.log 2>&1
 0 18 * * * <path_to_conda_env_bin_python> <path_to_script_main_entry> > <your_log_path_and_name> 2>&1
 ```
