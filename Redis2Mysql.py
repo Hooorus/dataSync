@@ -60,7 +60,7 @@ class Redis2Mysql:
             for key in redis_results:
                 key = key.decode('utf-8')
                 logging.info(f"\033[32m====QUERY KEY====\n{key}\033[0m")
-                # 获取Redis键的前缀
+                # 获取Redis键的前缀  xywy:uuid
                 prefix = key.split(':')[0]
 
                 self.batch_sync_controller(key, prefix, self.db_name_list, self.table_structures)
@@ -76,6 +76,7 @@ class Redis2Mysql:
                 self.mysql_cursor.close()
             if 'mysql_connection' in locals() and self.mysql_connection is not None:
                 self.mysql_connection.close()
+
             # 关闭 Redis 连接
             if 'redis_connection' in locals() and self.redis_connection is not None:
                 self.redis_connection.close()
